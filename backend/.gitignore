@@ -1,0 +1,19 @@
+backend/.gitignore
+
+Virtual environment
+
+venv/
+.venv/
+env/
+.env
+
+IDE
+
+.vscode/
+.idea/
+
+Python cache
+
+pycache/
+*.py[cod]
+*$py.class

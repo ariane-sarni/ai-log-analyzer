@@ -1,18 +1,20 @@
 // frontend/src/components/FileUploader.tsx
-import { useState, useRef, DragEvent } from 'react';
-import { UploadCloud, FileText, Loader2 } from 'lucide-react';
+import React, { useState, useRef, DragEvent } from 'react'; // <-- THIS IS THE FIX
+import { UploadCloud, FileText, Loader2, AlertCircle } from 'lucide-react';
 
 interface FileUploaderProps {
   file: File | null;
   setFile: (file: File | null) => void;
   onUpload: () => void;
   isLoading: boolean;
+  error: string | null; // New error prop
 }
 
-export default function FileUploader({ file, setFile, onUpload, isLoading }: FileUploaderProps) {
+export default function FileUploader({ file, setFile, onUpload, isLoading, error }: FileUploaderProps) {
   const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // ... (file change and drag/drop handlers remain the same) ...
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setFile(e.target.files[0]);
@@ -43,13 +45,12 @@ export default function FileUploader({ file, setFile, onUpload, isLoading }: Fil
 
   const dropzoneClasses = `border-2 border-dashed border-gray-600 rounded-lg p-12 text-center text-gray-400 transition-colors ${
     isDragging ? 'border-blue-400 bg-gray-700' : 'hover:border-blue-400'
-  }`;
+  } ${error ? 'border-red-500' : ''}`; // Highlight border on error
 
   return (
     <div className="w-full max-w-3xl p-8 bg-gray-800 rounded-lg shadow-lg">
       <h2 className="text-2xl font-semibold mb-6 text-white text-center">Upload Log File</h2>
 
-      {/* Hidden file input */}
       <input 
         type="file" 
         ref={inputRef}
@@ -103,6 +104,14 @@ export default function FileUploader({ file, setFile, onUpload, isLoading }: Fil
               )}
             </button>
           </div>
+        </div>
+      )}
+
+      {/* New Error Message Display */}
+      {error && (
+        <div className="mt-6 p-4 bg-red-900/50 border border-red-700 text-red-300 rounded-lg flex items-center gap-3">
+          <AlertCircle size={20} />
+          <p>{error}</p>
         </div>
       )}
     </div>

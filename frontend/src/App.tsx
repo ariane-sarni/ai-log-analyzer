@@ -1,41 +1,64 @@
 // frontend/src/App.tsx
-import { useState } from 'react';
+import React, { useState } from 'react'; // <-- THIS IS THE FIX
+import axios from 'axios';
 import Header from './components/Header';
 import FileUploader from './components/FileUploader';
 import AnalysisDashboard from './components/AnalysisDashboard';
 
-// We'll define a type for our analysis results later
+// Define the API URL
+const API_URL = "http://localhost:8000/api/analyze";
+
+// Define a simple type for the analysis result
+// We'll replace 'any' with a proper type later
 type AnalysisResult = any;
 
 function App() {
   const [file, setFile] = useState<File | null>(null);
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null); // New error state
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (!file) return;
 
     console.log("Uploading file:", file.name);
     setIsLoading(true);
-    
-    // TODO: Actually send the file to the backend
-    // For now, just simulate a successful analysis
-    setTimeout(() => {
-      setAnalysis({
-        summary: `The log file '${file.name}' shows 3 critical errors, 12 warnings, and 1 segmentation fault. The primary anomaly occurred at 03:00:15...`,
-        anomalies: [
-          { type: 'error', timestamp: '03:00:15', message: 'SEGFAULT (Core Dumped)' },
-          { type: 'warning', timestamp: '02:45:10', message: "Connection timeout to 'db-primary'." },
-          { type: 'info', timestamp: '01:15:02', message: 'System boot successful.' },
-        ]
+    setError(null); // Clear previous errors
+
+    // Use FormData to send the file
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      // Make the actual API call
+      const response = await axios.post(API_URL, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
       });
+      
+      // Set the analysis from the API response
+      setAnalysis(response.data);
+
+    } catch (err) {
+      console.error("Error uploading file:", err);
+      // Handle different error types
+      if (axios.isAxiosError(err) && err.response) {
+        setError(`Error: ${err.response.data.detail || err.response.statusText}`);
+      } else if (axios.isAxiosError(err) && err.request) {
+        setError("Error: The server is not responding. Is the backend running?");
+      } else {
+        setError("An unknown error occurred.");
+      }
+    } finally {
       setIsLoading(false);
-    }, 2000);
+    }
   };
 
   const handleReset = () => {
     setFile(null);
     setAnalysis(null);
+    setError(null); // Clear errors on reset
   };
 
   return (
@@ -49,6 +72,7 @@ function App() {
             setFile={setFile}
             onUpload={handleUpload}
             isLoading={isLoading}
+            error={error} // Pass the error prop
           />
         )}
         

@@ -1,4 +1,5 @@
 // frontend/src/components/Header.tsx
+import React from 'react'; // <-- THIS IS THE FIX
 import { Bot } from 'lucide-react';
 
 export default function Header() {

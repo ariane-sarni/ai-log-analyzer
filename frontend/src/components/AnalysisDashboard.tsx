@@ -1,4 +1,5 @@
 // frontend/src/components/AnalysisDashboard.tsx
+import React from 'react'; // <-- THIS IS THE FIX
 import { AlertTriangle, CheckCircle, Info, RefreshCcw } from 'lucide-react';
 
 // Define a simple type for an anomaly

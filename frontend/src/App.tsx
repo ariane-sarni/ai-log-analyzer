@@ -1,5 +1,5 @@
 // frontend/src/App.tsx
-import React, { useState } from 'react'; // <-- THIS IS THE FIX
+import React, { useState } from 'react';
 import axios from 'axios';
 import Header from './components/Header';
 import FileUploader from './components/FileUploader';
@@ -8,41 +8,37 @@ import AnalysisDashboard from './components/AnalysisDashboard';
 // Define the API URL
 const API_URL = "http://localhost:8000/api/analyze";
 
-// Define a simple type for the analysis result
-// We'll replace 'any' with a proper type later
 type AnalysisResult = any;
 
 function App() {
   const [file, setFile] = useState<File | null>(null);
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null); // New error state
+  const [error, setError] = useState<string | null>(null);
 
-  const handleUpload = async () => {
+  // We add query to the handleUpload function
+  const handleUpload = async (query: string) => {
     if (!file) return;
 
-    console.log("Uploading file:", file.name);
+    console.log(`Uploading file: ${file.name} with query: "${query}"`);
     setIsLoading(true);
-    setError(null); // Clear previous errors
+    setError(null);
 
-    // Use FormData to send the file
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("query", query); // Add the query to the form data
 
     try {
-      // Make the actual API call
       const response = await axios.post(API_URL, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
       
-      // Set the analysis from the API response
       setAnalysis(response.data);
 
     } catch (err) {
       console.error("Error uploading file:", err);
-      // Handle different error types
       if (axios.isAxiosError(err) && err.response) {
         setError(`Error: ${err.response.data.detail || err.response.statusText}`);
       } else if (axios.isAxiosError(err) && err.request) {
@@ -58,7 +54,7 @@ function App() {
   const handleReset = () => {
     setFile(null);
     setAnalysis(null);
-    setError(null); // Clear errors on reset
+    setError(null);
   };
 
   return (
@@ -70,9 +66,9 @@ function App() {
           <FileUploader 
             file={file}
             setFile={setFile}
-            onUpload={handleUpload}
+            onUpload={handleUpload} // onUpload now expects the query
             isLoading={isLoading}
-            error={error} // Pass the error prop
+            error={error}
           />
         )}
         

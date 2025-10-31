@@ -1,79 +1,81 @@
 // frontend/src/components/AnalysisDashboard.tsx
-import React from 'react'; // <-- THIS IS THE FIX
-import { AlertTriangle, CheckCircle, Info, RefreshCcw } from 'lucide-react';
+import React from 'react';
+import { Bot, RefreshCw } from 'lucide-react';
+import AnomalyItem from './AnomalyItem'; // Import the new component
 
-// Define a simple type for an anomaly
+// Define the types
+type AnomalyType = 'info' | 'warning' | 'error';
 interface Anomaly {
-  type: 'info' | 'warning' | 'error';
+  type: AnomalyType;
   timestamp: string;
   message: string;
 }
+interface AnalysisReport {
+  summary: string;
+  anomalies: Anomaly[];
+}
 
-// Define the shape of the analysis prop
 interface AnalysisDashboardProps {
-  analysis: {
-    summary: string;
-    anomalies: Anomaly[];
-  };
+  analysis: AnalysisReport | null;
   onReset: () => void;
 }
 
-const iconMap = {
-  info: <CheckCircle size={18} className="mr-2 text-green-400" />,
-  warning: <AlertTriangle size={18} className="mr-2 text-yellow-400" />,
-  error: <AlertTriangle size={18} className="mr-2 text-red-400" />,
-};
-
-const colorMap = {
-  info: 'text-green-400',
-  warning: 'text-yellow-400',
-  error: 'text-red-400',
-};
-
 export default function AnalysisDashboard({ analysis, onReset }: AnalysisDashboardProps) {
+
   if (!analysis) {
     return (
-      <div className="w-full max-w-3xl p-8 bg-gray-800 rounded-lg shadow-lg text-gray-400 text-center">
-        <Info size={32} className="mx-auto mb-4" />
-        <p>Upload a file to see the analysis dashboard.</p>
+      <div className="w-full max-w-4xl p-8 bg-gray-800 rounded-lg shadow-lg">
+        <h2 className="text-2xl font-bold mb-4">Analysis Report</h2>
+        <p className="text-gray-400">No analysis data available.</p>
       </div>
     );
   }
 
+  const { summary, anomalies } = analysis;
+
   return (
-    <div className="w-full max-w-5xl p-8 bg-gray-800 rounded-lg shadow-lg animate-fade-in">
+    <div className="w-full max-w-4xl p-8 bg-gray-800 rounded-lg shadow-lg animate-fade-in">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-3xl font-semibold text-white">Analysis Report</h2>
-        <button 
+        <h2 className="text-3xl font-bold text-white">Analysis Report</h2>
+        <button
           onClick={onReset}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
         >
-          <RefreshCcw size={18} />
+          <RefreshCw className="w-4 h-4" />
           Analyze New File
         </button>
       </div>
-      
-      <div className="space-y-6">
-        {/* Summary Card */}
-        <div className="bg-gray-700 p-6 rounded-lg shadow-inner">
-          <h3 className="text-xl font-medium text-white mb-3">AI Summary</h3>
-          <p className="text-gray-300 leading-relaxed">
-            {analysis.summary}
-          </p>
-        </div>
 
-        {/* Anomalies Card */}
-        <div className="bg-gray-700 p-6 rounded-lg shadow-inner">
-          <h3 className="text-xl font-medium text-white mb-4">Detected Anomalies</h3>
-          <ul className="mt-2 space-y-3">
-            {analysis.anomalies.map((anomaly, index) => (
-              <li key={index} className={`flex items-center ${colorMap[anomaly.type]}`}>
-                {iconMap[anomaly.type]}
-                <span className="font-mono text-sm mr-4">[{anomaly.timestamp}]</span>
-                <span className="text-gray-300">{anomaly.message}</span>
-              </li>
-            ))}
-          </ul>
+      {/* AI Summary Section */}
+      <div className="mb-8">
+        <h3 className="flex items-center text-xl font-semibold text-gray-200 mb-3">
+          <Bot className="w-5 h-5 mr-2 text-blue-400" />
+          AI Summary
+        </h3>
+        <div className="p-4 bg-gray-900 border border-gray-700 rounded-lg">
+          {summary ? (
+            <p className="text-gray-300 leading-relaxed">{summary}</p>
+          ) : (
+            <p className="text-gray-500">No data was provided for analysis. The system health cannot be determined from the current input.</p>
+          )}
+        </div>
+      </div>
+
+      {/* Detected Anomalies Section */}
+      <div>
+        <h3 className="text-xl font-semibold text-gray-200 mb-3">
+          Detected Anomalies
+        </h3>
+        <div className="p-4 bg-gray-900 border border-gray-700 rounded-lg">
+          {anomalies && anomalies.length > 0 ? (
+            <div className="flex flex-col gap-3">
+              {anomalies.map((anomaly, index) => (
+                <AnomalyItem key={index} anomaly={anomaly} />
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500">No anomalies were detected in this log file.</p>
+          )}
         </div>
       </div>
     </div>

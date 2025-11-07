@@ -35,28 +35,21 @@ You will need two terminals to run the project.
 1. **Navigate to the backend directory:**
 
 ```
-
 cd backend
-
 ```
 
 2. **Create and activate a virtual environment:**
 
 ```
-
 # (If using fish shell)
-
 python -m venv venv
 source venv/bin/activate.fish
-
 ```
 
 3. **Install Python dependencies:**
 
 ```
-
 pip install -r requirements.txt
-
 ```
 
 4. **Create your environment file:**
@@ -69,9 +62,7 @@ pip install -r requirements.txt
 5. **Run the server:**
 
 ```
-
 uvicorn main:app --reload
-
 ```
 
 The backend will be running at `http://localhost:8000`.
@@ -81,34 +72,25 @@ The backend will be running at `http://localhost:8000`.
 1. **Navigate to the frontend directory:**
 
 ```
-
 cd frontend
-
 ```
 
 2. **Activate Node.js (if using nvm):**
 
 ```
-
 nvm use --lts
-
 ```
 
 3. **Install Node.js dependencies:**
 
 ```
-
 npm install
-
 ```
 
 4. **Run the app:**
 
 ```
-
 npm run dev
-
 ```
 
 The frontend will be running at `http://localhost:5173`.
-```
